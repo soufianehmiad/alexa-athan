@@ -1,0 +1,2 @@
+CFBundleDisplayName = "Athan";
+NSLocationWhenInUseUsageDescription = "Votre position est utilisee pour calculer les horaires de priere precis pour votre region.";

@@ -1,0 +1,34 @@
+Athan for Alexa
+Copyright 2026 Athan for Alexa Contributors
+
+This project includes software developed by third parties.
+
+==========================================================================
+
+Adhan-Swift
+https://github.com/batoulapps/adhan-swift
+Copyright (c) Batoul Apps
+Licensed under the MIT License
+
+Used by: core-prayer-engine (Swift), ios-app
+
+==========================================================================
+
+Adhan-JS (adhan)
+https://github.com/batoulapps/adhan-js
+Copyright (c) Batoul Apps
+Licensed under the MIT License
+
+Used by: core-prayer-engine (TypeScript), backend, alexa-skill
+
+==========================================================================
+
+ASK SDK for Node.js (ask-sdk)
+https://github.com/alexa/alexa-skills-kit-sdk-for-nodejs
+Copyright (c) Amazon.com, Inc. or its affiliates
+Licensed under the Apache License, Version 2.0
+
+Used by: alexa-skill
+
+You may obtain a copy of the Apache License at:
+http://www.apache.org/licenses/LICENSE-2.0

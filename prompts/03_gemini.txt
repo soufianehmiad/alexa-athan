@@ -1,0 +1,17 @@
+You are a senior systems architect reviewing an open-source smart home platform.
+
+Here are:
+- PRD
+- Technical Design
+- Architecture decision
+
+Your task:
+1) Identify weak assumptions about Alexa
+2) Flag reliability risks
+3) Identify privacy weaknesses
+4) Identify scaling risks
+5) Suggest simplifications
+6) Suggest improvements to modularity
+7) Identify policy compliance concerns
+
+Output a structured review with prioritized fixes.

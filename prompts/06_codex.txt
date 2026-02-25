@@ -1,0 +1,11 @@
+Create an Alexa Skill skeleton for Athan playback.
+
+Requirements:
+- Device discovery handler
+- PlayAthan intent
+- Authentication placeholder
+- Modular design (DeviceProvider pattern)
+- Scheduling placeholder
+- No hardcoded logic
+
+Output runnable Alexa skill structure.

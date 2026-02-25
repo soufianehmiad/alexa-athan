@@ -1,0 +1,10 @@
+Review this Alexa Skill implementation.
+
+Evaluate:
+- Playback reliability
+- Scheduling realism
+- Policy compliance
+- Failure modes
+- Suggested improvements
+
+Be critical.

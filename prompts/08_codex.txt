@@ -1,0 +1,11 @@
+Implement local-only prayer tracking module.
+
+Requirements:
+- Store locally
+- Mark prayer completed
+- Daily overview
+- No cloud
+- Clear data model
+- Migration-safe
+
+Include tests.

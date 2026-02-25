@@ -1,0 +1,91 @@
+/* Arabic Localizations for Athan for Alexa */
+
+/* Tab Titles */
+"tab.prayerTimes" = "مواقيت الصلاة";
+"tab.tracking" = "المتابعة";
+"tab.settings" = "الإعدادات";
+
+/* Prayer Names */
+"prayer.fajr" = "الفجر";
+"prayer.sunrise" = "الشروق";
+"prayer.dhuhr" = "الظهر";
+"prayer.asr" = "العصر";
+"prayer.maghrib" = "المغرب";
+"prayer.isha" = "العشاء";
+
+/* Prayer Status */
+"status.upcoming" = "قادمة";
+"status.completed" = "تمت الصلاة";
+"status.completedLate" = "صلاة متأخرة";
+"status.missed" = "فائتة";
+
+/* Countdown */
+"countdown.next" = "التالي: %@";
+"countdown.allDone" = "تمت جميع الصلوات";
+
+/* Tracking */
+"tracking.prayersToday" = "صلوات اليوم";
+"tracking.thisWeek" = "هذا الأسبوع";
+
+/* Settings */
+"settings.location" = "الموقع";
+"settings.city" = "المدينة";
+"settings.latitude" = "خط العرض";
+"settings.longitude" = "خط الطول";
+"settings.calculationMethod" = "طريقة الحساب";
+"settings.method" = "الطريقة";
+"settings.madhab" = "المذهب (العصر)";
+"settings.offsets" = "تعديل الأوقات (دقائق)";
+"settings.alexa" = "أليكسا";
+"settings.alexaDevices" = "أجهزة أليكسا";
+"settings.linked" = "متصل";
+"settings.notLinked" = "غير متصل";
+"settings.support" = "الدعم";
+"settings.donate" = "تبرع";
+"settings.about" = "حول";
+"settings.version" = "الإصدار";
+"settings.privacy" = "لا يتم جمع أي بيانات";
+"settings.sourceCode" = "الكود المصدري";
+
+/* Onboarding */
+"onboarding.appName" = "أذان لأليكسا";
+"onboarding.welcome" = "استمع إلى الأذان على أجهزة أليكسا في الأوقات الصحيحة. مجاني ومفتوح المصدر وخصوصية أولاً.";
+"onboarding.getStarted" = "ابدأ";
+"onboarding.selectCity" = "اختر مدينتك";
+"onboarding.continue" = "متابعة";
+"onboarding.calculationMethod" = "طريقة الحساب";
+"onboarding.linkAlexa" = "اربط أليكسا";
+"onboarding.linkAlexaDesc" = "اربط حساب أمازون لتشغيل الأذان على أجهزة أليكسا. يمكنك القيام بذلك لاحقاً من الإعدادات.";
+"onboarding.skipForNow" = "تخطي الآن";
+"onboarding.allSet" = "أنت جاهز!";
+"onboarding.allSetDesc" = "مواقيت الصلاة جاهزة. سيتم تشغيل الأذان تلقائياً على أجهزة أليكسا المرتبطة.";
+"onboarding.start" = "ابدأ استخدام الأذان";
+
+/* Device Setup */
+"device.amazonAccount" = "حساب أمازون";
+"device.accountLinked" = "حساب أمازون مرتبط";
+"device.unlinkAccount" = "إلغاء ربط حساب أمازون";
+"device.linkAccount" = "ربط حساب أمازون";
+"device.authenticating" = "جارٍ المصادقة...";
+"device.availableDevices" = "الأجهزة المتاحة";
+"device.discovering" = "جارٍ اكتشاف الأجهزة...";
+"device.noDevices" = "لم يتم العثور على أجهزة أليكسا.";
+"device.refresh" = "تحديث الأجهزة";
+"device.configured" = "الأجهزة المُعدّة";
+"device.add" = "إضافة";
+
+/* Donation */
+"donation.title" = "ادعم أذان لأليكسا";
+"donation.description" = "هذا التطبيق مجاني ومفتوح المصدر. تبرعك يساعد في تغطية تكاليف الخوادم والتطوير المستمر.";
+"donation.thanks" = "شكراً لتبرعك!";
+"donation.blessing" = "جزاك الله خيراً.";
+"donation.loading" = "جارٍ التحميل...";
+"donation.unavailable" = "التبرعات غير متاحة حالياً.";
+
+/* Errors */
+"error.noToken" = "يرجى ربط حساب أمازون أولاً.";
+"error.serverError" = "فشل الاتصال بالخادم. يرجى المحاولة مرة أخرى.";
+"error.missingToken" = "لم يتم استلام رمز الوصول من أمازون.";
+"error.sessionStartFailed" = "فشل في بدء جلسة المصادقة.";
+"error.unableToCalculate" = "تعذر الحساب";
+"error.checkLocation" = "تحقق من إعدادات الموقع.";

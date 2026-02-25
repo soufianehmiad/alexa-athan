@@ -1,0 +1,17 @@
+{
+  "name": "@athan/core-prayer-engine",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "node ./src/application/prayer-time-engine.js",
+    "test": "node --test"
+  },
+  "description": "Reusable prayer time calculation library for Athan applications.",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,91 @@
+/* French Localizations for Athan for Alexa */
+
+/* Tab Titles */
+"tab.prayerTimes" = "Horaires de priere";
+"tab.tracking" = "Suivi";
+"tab.settings" = "Parametres";
+
+/* Prayer Names */
+"prayer.fajr" = "Fajr";
+"prayer.sunrise" = "Lever du soleil";
+"prayer.dhuhr" = "Dhuhr";
+"prayer.asr" = "Asr";
+"prayer.maghrib" = "Maghrib";
+"prayer.isha" = "Isha";
+
+/* Prayer Status */
+"status.upcoming" = "A venir";
+"status.completed" = "Accomplie";
+"status.completedLate" = "Accomplie en retard";
+"status.missed" = "Manquee";
+
+/* Countdown */
+"countdown.next" = "Suivante : %@";
+"countdown.allDone" = "Toutes les prieres sont terminees";
+
+/* Tracking */
+"tracking.prayersToday" = "Prieres aujourd'hui";
+"tracking.thisWeek" = "Cette semaine";
+
+/* Settings */
+"settings.location" = "Emplacement";
+"settings.city" = "Ville";
+"settings.latitude" = "Latitude";
+"settings.longitude" = "Longitude";
+"settings.calculationMethod" = "Methode de calcul";
+"settings.method" = "Methode";
+"settings.madhab" = "Madhab (Asr)";
+"settings.offsets" = "Ajustements des horaires (minutes)";
+"settings.alexa" = "Alexa";
+"settings.alexaDevices" = "Appareils Alexa";
+"settings.linked" = "Connecte";
+"settings.notLinked" = "Non connecte";
+"settings.support" = "Soutien";
+"settings.donate" = "Faire un don";
+"settings.about" = "A propos";
+"settings.version" = "Version";
+"settings.privacy" = "Aucune donnee collectee";
+"settings.sourceCode" = "Code source";
+
+/* Onboarding */
+"onboarding.appName" = "Athan pour Alexa";
+"onboarding.welcome" = "Ecoutez l'appel a la priere sur vos appareils Alexa aux horaires corrects. Gratuit, open source et respectueux de la vie privee.";
+"onboarding.getStarted" = "Commencer";
+"onboarding.selectCity" = "Selectionnez votre ville";
+"onboarding.continue" = "Continuer";
+"onboarding.calculationMethod" = "Methode de calcul";
+"onboarding.linkAlexa" = "Connecter Alexa";
+"onboarding.linkAlexaDesc" = "Connectez votre compte Amazon pour jouer l'Athan sur vos appareils Alexa. Vous pouvez le faire plus tard dans les parametres.";
+"onboarding.skipForNow" = "Passer pour le moment";
+"onboarding.allSet" = "Tout est pret !";
+"onboarding.allSetDesc" = "Vos horaires de priere sont prets. L'Athan sera joue automatiquement sur vos appareils Alexa connectes.";
+"onboarding.start" = "Commencer a utiliser Athan";
+
+/* Device Setup */
+"device.amazonAccount" = "Compte Amazon";
+"device.accountLinked" = "Compte Amazon connecte";
+"device.unlinkAccount" = "Deconnecter le compte Amazon";
+"device.linkAccount" = "Connecter le compte Amazon";
+"device.authenticating" = "Authentification en cours...";
+"device.availableDevices" = "Appareils disponibles";
+"device.discovering" = "Recherche d'appareils...";
+"device.noDevices" = "Aucun appareil Alexa trouve.";
+"device.refresh" = "Actualiser les appareils";
+"device.configured" = "Appareils configures";
+"device.add" = "Ajouter";
+
+/* Donation */
+"donation.title" = "Soutenir Athan pour Alexa";
+"donation.description" = "Cette application est gratuite et open source. Votre don aide a couvrir les couts des serveurs et le developpement continu.";
+"donation.thanks" = "Merci pour votre don !";
+"donation.blessing" = "Qu'Allah vous recompense.";
+"donation.loading" = "Chargement...";
+"donation.unavailable" = "Les dons ne sont pas disponibles pour le moment.";
+
+/* Errors */
+"error.noToken" = "Veuillez d'abord connecter votre compte Amazon.";
+"error.serverError" = "Impossible de communiquer avec le serveur. Veuillez reessayer.";
+"error.missingToken" = "Aucun jeton d'acces recu d'Amazon.";
+"error.sessionStartFailed" = "Impossible de demarrer la session d'authentification.";
+"error.unableToCalculate" = "Calcul impossible";
+"error.checkLocation" = "Verifiez vos parametres de localisation.";

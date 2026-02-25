@@ -1,0 +1,20 @@
+Generate a production-ready repository scaffold for:
+
+Athan for Alexa
+
+Structure:
+- /docs
+- /core-prayer-engine
+- /ios-app
+- /alexa-skill
+- /scripts
+
+Include:
+- README.md
+- package.json or equivalent
+- minimal runnable placeholders
+- setup scripts
+- test script
+- folder-level READMEs
+
+No analysis. Output code only.

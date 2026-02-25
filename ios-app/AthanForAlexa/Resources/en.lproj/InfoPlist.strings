@@ -1,0 +1,2 @@
+CFBundleDisplayName = "Athan";
+NSLocationWhenInUseUsageDescription = "Your location is used to calculate accurate prayer times for your area.";

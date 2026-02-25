@@ -1,0 +1,59 @@
+name: Backend & Alexa Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'alexa-skill/**'
+      - 'core-prayer-engine/typescript/**'
+      - '.github/workflows/backend-tests.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  prayer-engine:
+    name: Prayer Engine Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: core-prayer-engine/typescript/package-lock.json
+      - run: npm ci
+        working-directory: core-prayer-engine/typescript
+      - run: npm test
+        working-directory: core-prayer-engine/typescript
+
+  backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+        working-directory: backend
+      - run: npm test
+        working-directory: backend
+
+  alexa-skill:
+    name: Alexa Skill Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: alexa-skill/package-lock.json
+      - run: npm ci
+        working-directory: alexa-skill
+      - run: npm test
+        working-directory: alexa-skill

@@ -1,0 +1,20 @@
+{
+  "name": "athan-for-alexa",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Monorepo scaffold for Athan for Alexa.",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "core-prayer-engine",
+    "alexa-skill"
+  ],
+  "scripts": {
+    "setup": "node ./scripts/setup.mjs",
+    "test": "node ./scripts/test.mjs",
+    "start:core": "npm --workspace core-prayer-engine run start",
+    "start:alexa": "npm --workspace alexa-skill run start"
+  },
+  "license": "UNLICENSED"
+}

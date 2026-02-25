@@ -1,0 +1,95 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "athan",
+      "intents": [
+        {
+          "name": "PlayAthanIntent",
+          "slots": [],
+          "samples": [
+            "play the athan",
+            "play athan",
+            "play the adhan",
+            "play adhan",
+            "play the call to prayer",
+            "start the athan",
+            "I want to hear the athan",
+            "let me hear the athan",
+            "play azan",
+            "play the azan",
+            "give me the athan",
+            "call to prayer"
+          ]
+        },
+        {
+          "name": "GetPrayerTimesIntent",
+          "slots": [],
+          "samples": [
+            "what are today's prayer times",
+            "prayer times",
+            "tell me the prayer times",
+            "what time is fajr",
+            "when are the prayers",
+            "give me the prayer times",
+            "what are the prayer times",
+            "when is the next prayer",
+            "prayer schedule",
+            "today's prayer times",
+            "salah times",
+            "what are the salah times",
+            "when are today's prayers",
+            "give me today's prayer schedule"
+          ]
+        },
+        {
+          "name": "SetCityIntent",
+          "slots": [
+            {
+              "name": "CityName",
+              "type": "AMAZON.City",
+              "samples": [
+                "set my city to {CityName}",
+                "{CityName}",
+                "change city to {CityName}",
+                "use {CityName}",
+                "switch to {CityName}"
+              ]
+            }
+          ],
+          "samples": [
+            "set my city to {CityName}",
+            "set city to {CityName}",
+            "change my city to {CityName}",
+            "change city to {CityName}",
+            "I'm in {CityName}",
+            "my city is {CityName}",
+            "use {CityName}",
+            "switch to {CityName}",
+            "set location to {CityName}",
+            "I live in {CityName}"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        }
+      ]
+    }
+  }
+}

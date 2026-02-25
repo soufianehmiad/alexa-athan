@@ -1,0 +1,61 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "summary": "Get Islamic prayer times and listen to the athan call to prayer.",
+          "examplePhrases": [
+            "Alexa, open Athan",
+            "Alexa, ask Athan for prayer times",
+            "Alexa, ask Athan to play the athan"
+          ],
+          "keywords": [
+            "athan",
+            "adhan",
+            "prayer",
+            "salah",
+            "islam",
+            "muslim",
+            "prayer times"
+          ],
+          "name": "Athan",
+          "description": "Athan is your personal Islamic prayer companion. Get accurate prayer times for your city and listen to the beautiful call to prayer. Say 'Alexa, open Athan' to get started, then set your city and ask for prayer times or play the athan."
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Open the skill by saying 'Alexa, open Athan'. Set a city with 'set my city to Mecca'. Ask for prayer times with 'what are today's prayer times'. Play the athan with 'play the athan'.",
+      "category": "EDUCATION_AND_REFERENCE"
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:ACCOUNT_ID:function:athan-alexa-skill"
+        },
+        "interfaces": [
+          {
+            "type": "AUDIO_PLAYER"
+          }
+        ]
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa::alerts:reminders:skill:readwrite"
+      }
+    ],
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "https://github.com/your-repo/athan/blob/main/PRIVACY.md",
+          "termsOfUseUrl": "https://github.com/your-repo/athan/blob/main/SECURITY.md"
+        }
+      },
+      "isExportCompliant": true,
+      "containsAds": false,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
+    }
+  }
+}

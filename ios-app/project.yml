@@ -1,0 +1,59 @@
+name: AthanForAlexa
+options:
+  bundleIdPrefix: com.athanforalexa
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+
+packages:
+  AthanPrayerEngine:
+    path: ../core-prayer-engine/swift
+
+targets:
+  AthanForAlexa:
+    type: application
+    platform: iOS
+    sources:
+      - path: AthanForAlexa
+        excludes:
+          - Resources/**
+    resources:
+      - path: AthanForAlexa/Resources
+    settings:
+      base:
+        INFOPLIST_FILE: AthanForAlexa/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.athanforalexa.app
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: AthanForAlexa/AthanForAlexa.entitlements
+        GENERATE_INFOPLIST_FILE: false
+        SUPPORTED_INTERFACE_ORIENTATIONS: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        SUPPORTED_INTERFACE_ORIENTATIONS~ipad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+    dependencies:
+      - package: AthanPrayerEngine
+        product: AthanPrayerEngine
+      - framework: Security.framework
+        implicit: true
+      - framework: StoreKit.framework
+        implicit: true
+      - framework: AuthenticationServices.framework
+        implicit: true
+    scheme:
+      testTargets:
+        - AthanForAlexaTests
+
+  AthanForAlexaTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: AthanForAlexaTests
+    dependencies:
+      - target: AthanForAlexa
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
