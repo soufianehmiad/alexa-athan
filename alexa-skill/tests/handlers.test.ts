@@ -5,8 +5,10 @@ import {
   createLaunchRequestEnvelope,
   createSessionEndedRequestEnvelope,
   createAudioPlayerRequestEnvelope,
+  createMessageReceivedEnvelope,
 } from './helpers';
 
+import { MessageReceivedHandler } from '../lambda/handlers/MessageReceivedHandler';
 import { LaunchHandler } from '../lambda/handlers/LaunchHandler';
 import { PlayAthanHandler } from '../lambda/handlers/PlayAthanHandler';
 import { PrayerTimesHandler } from '../lambda/handlers/PrayerTimesHandler';
@@ -26,6 +28,7 @@ import { ErrorHandler } from '../lambda/handlers/ErrorHandler';
 function createSkill() {
   return SkillBuilders.custom()
     .addRequestHandlers(
+      MessageReceivedHandler,
       LaunchHandler,
       PlayAthanHandler,
       PrayerTimesHandler,
@@ -52,6 +55,94 @@ function speechText(response: ResponseEnvelope): string {
   return (output as any).text || '';
 }
 
+// Mock the ReminderService for MessageReceivedHandler tests
+jest.mock('../lambda/services/ReminderService', () => ({
+  createReminder: jest.fn().mockResolvedValue({ alertToken: 'mock-alert-token' }),
+  deleteAllReminders: jest.fn().mockResolvedValue(3),
+  buildReminderRequest: jest.fn((prayer: string, time: string, tz: string) => ({
+    requestTime: new Date().toISOString(),
+    trigger: { type: 'SCHEDULED_ABSOLUTE', scheduledTime: time, timeZoneId: tz },
+    alertInfo: { spokenInfo: { content: [{ locale: 'en-US', text: `It is time for ${prayer} prayer.` }] } },
+    pushNotification: { status: 'ENABLED' },
+  })),
+}));
+
+describe('MessageReceivedHandler', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('handles Messaging.MessageReceived request type', async () => {
+    const skill = createSkill();
+    // Use a future time so the prayer won't be skipped
+    const futureTime = new Date(Date.now() + 3600_000).toISOString();
+    const envelope = createMessageReceivedEnvelope({
+      message: {
+        operation: 'SCHEDULE_REMINDERS',
+        prayerTimes: { fajr: futureTime },
+        timezone: 'America/Chicago',
+        date: '2026-02-25',
+        requestId: 'test-req-1',
+      },
+    });
+
+    const response = await skill.invoke(envelope, {}) as ResponseEnvelope;
+
+    expect(response).toBeDefined();
+    expect(response.response).toBeDefined();
+    // Messaging.MessageReceived should return no speech output
+    expect(response.response?.outputSpeech).toBeUndefined();
+  });
+
+  it('ignores unknown operations', async () => {
+    const skill = createSkill();
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    const envelope = createMessageReceivedEnvelope({
+      message: {
+        operation: 'UNKNOWN_OPERATION',
+      },
+    });
+
+    const response = await skill.invoke(envelope, {}) as ResponseEnvelope;
+
+    expect(response).toBeDefined();
+    expect(response.response).toBeDefined();
+    expect(response.response?.outputSpeech).toBeUndefined();
+    consoleSpy.mockRestore();
+  });
+
+  it('processes SCHEDULE_REMINDERS operation', async () => {
+    const { createReminder, deleteAllReminders } = require('../lambda/services/ReminderService');
+    const skill = createSkill();
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+    // Use future times so they won't be skipped
+    const futureBase = Date.now() + 3600_000;
+    const envelope = createMessageReceivedEnvelope({
+      message: {
+        operation: 'SCHEDULE_REMINDERS',
+        prayerTimes: {
+          fajr: new Date(futureBase).toISOString(),
+          dhuhr: new Date(futureBase + 3600_000).toISOString(),
+          asr: new Date(futureBase + 7200_000).toISOString(),
+        },
+        timezone: 'America/Chicago',
+        date: '2026-02-25',
+        requestId: 'test-req-2',
+      },
+    });
+
+    const response = await skill.invoke(envelope, {}) as ResponseEnvelope;
+
+    expect(response).toBeDefined();
+    expect(deleteAllReminders).toHaveBeenCalledWith('test-token', 'https://api.amazonalexa.com');
+    expect(createReminder).toHaveBeenCalledTimes(3);
+    consoleSpy.mockRestore();
+    warnSpy.mockRestore();
+  });
+});
+
 describe('LaunchHandler', () => {
   it('returns a welcome message with next prayer info', async () => {
     const skill = createSkill();
@@ -62,6 +153,15 @@ describe('LaunchHandler', () => {
     const text = speechText(response);
     expect(text).toContain('Welcome to Athan');
     expect(response.response?.shouldEndSession).toBe(false);
+  });
+
+  it('captures userId in session attributes', async () => {
+    const skill = createSkill();
+    const envelope = createLaunchRequestEnvelope();
+
+    const response = await skill.invoke(envelope, {}) as ResponseEnvelope;
+
+    expect(response.sessionAttributes?.alexaUserId).toBe('test-user-id');
   });
 
   it('uses city from session attributes if set', async () => {

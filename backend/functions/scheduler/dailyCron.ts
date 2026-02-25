@@ -1,78 +1,26 @@
 import type { ScheduledHandler } from "aws-lambda";
-import { scanAllDevices, putDevice } from "../../lib/deviceStore.js";
+import { scanAllDevices } from "../../lib/deviceStore.js";
 import type { DeviceConfig } from "../../lib/deviceStore.js";
 import { calculatePrayerTimes, PRAYER_NAMES } from "../../lib/prayerEngine.js";
-import type { CalculationMethodName, MadhabName } from "../../lib/prayerEngine.js";
-import {
-  refreshLwaToken,
-  createReminder,
-  getAllReminders,
-  deleteReminder,
-  buildReminderRequest,
-} from "../../lib/alexaReminders.js";
-import { encrypt, decrypt } from "../../lib/encryption.js";
+import { getSkillMessagingToken, sendSkillMessage } from "../../lib/skillMessaging.js";
 import { timezoneFromLongitude, getLocalDate, formatLocalDateTime } from "../../lib/timezone.js";
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "";
-const LWA_CLIENT_ID = process.env.LWA_CLIENT_ID || "";
-const LWA_CLIENT_SECRET = process.env.LWA_CLIENT_SECRET || "";
+const SKILL_CLIENT_ID = process.env.SKILL_CLIENT_ID || "";
+const SKILL_CLIENT_SECRET = process.env.SKILL_CLIENT_SECRET || "";
 
-async function refreshTokenForDevice(
-  device: DeviceConfig
-): Promise<{ accessToken: string; updatedDevice: boolean }> {
-  const refreshToken = decrypt(device.lwaRefreshTokenEncrypted, ENCRYPTION_KEY);
-
-  const tokenResult = await refreshLwaToken(refreshToken, LWA_CLIENT_ID, LWA_CLIENT_SECRET);
-
-  const newAccessTokenEncrypted = encrypt(tokenResult.access_token, ENCRYPTION_KEY);
-  const newRefreshTokenEncrypted = encrypt(tokenResult.refresh_token, ENCRYPTION_KEY);
-
-  await putDevice({
-    ...device,
-    lwaTokenEncrypted: newAccessTokenEncrypted,
-    lwaRefreshTokenEncrypted: newRefreshTokenEncrypted,
-  });
-
-  return { accessToken: tokenResult.access_token, updatedDevice: true };
-}
-
-async function deleteExistingReminders(accessToken: string): Promise<number> {
-  let deleted = 0;
-  try {
-    const existing = await getAllReminders(accessToken);
-    for (const alert of existing.alerts ?? []) {
-      try {
-        await deleteReminder(accessToken, alert.alertToken);
-        deleted++;
-      } catch (err) {
-        console.warn(`Failed to delete reminder ${alert.alertToken}:`, err);
-      }
-    }
-  } catch (err) {
-    console.warn("Failed to fetch existing reminders:", err);
+async function sendPrayerTimesForDevice(
+  device: DeviceConfig,
+  messagingToken: string
+): Promise<{ sent: boolean }> {
+  if (!device.alexaUserId) {
+    console.warn(`Device ${device.deviceToken} has no alexaUserId, skipping`);
+    return { sent: false };
   }
-  return deleted;
-}
 
-async function scheduleRemindersForDevice(device: DeviceConfig): Promise<{
-  scheduled: number;
-  errors: number;
-}> {
   const timezone = timezoneFromLongitude(device.lon);
   const localDate = getLocalDate(timezone);
 
   console.log(`Processing device ${device.deviceToken}: city=${device.city}, tz=${timezone}, date=${localDate.toISOString()}`);
-
-  let accessToken: string;
-  try {
-    const tokenResult = await refreshTokenForDevice(device);
-    accessToken = tokenResult.accessToken;
-  } catch (err) {
-    console.error(`Token refresh failed for device ${device.deviceToken}:`, err);
-    throw new Error(`Token refresh failed: ${err instanceof Error ? err.message : "Unknown error"}`);
-  }
-
-  await deleteExistingReminders(accessToken);
 
   const prayerTimes = calculatePrayerTimes({
     lat: device.lat,
@@ -84,39 +32,27 @@ async function scheduleRemindersForDevice(device: DeviceConfig): Promise<{
   });
 
   const enabledSet = new Set(device.enabledPrayers);
-  let scheduled = 0;
-  let errors = 0;
-
-  const now = new Date();
+  const prayerTimesPayload: Record<string, string> = {};
 
   for (const prayerName of PRAYER_NAMES) {
     if (!enabledSet.has(prayerName)) continue;
 
     const prayerTime = prayerTimes[prayerName as keyof typeof prayerTimes];
-    if (!(prayerTime instanceof Date) || prayerTime <= now) {
-      console.log(`Skipping ${prayerName}: time already passed or invalid`);
-      continue;
-    }
+    if (!(prayerTime instanceof Date)) continue;
 
-    const scheduledTimeLocal = formatLocalDateTime(prayerTime, timezone);
-    const reminder = buildReminderRequest(prayerName, scheduledTimeLocal, timezone);
-
-    try {
-      await createReminder(accessToken, reminder);
-      scheduled++;
-      console.log(`Scheduled ${prayerName} at ${scheduledTimeLocal} (${timezone})`);
-    } catch (err) {
-      errors++;
-      console.error(`Failed to schedule ${prayerName} for device ${device.deviceToken}:`, err);
-
-      if (err instanceof Error && err.message.includes("rate limit")) {
-        console.warn("Rate limit hit, waiting 2 seconds...");
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-      }
-    }
+    prayerTimesPayload[prayerName] = formatLocalDateTime(prayerTime, timezone);
   }
 
-  return { scheduled, errors };
+  const dateStr = localDate.toISOString().split("T")[0];
+
+  await sendSkillMessage(messagingToken, device.alexaUserId, {
+    prayerTimes: prayerTimesPayload,
+    timezone,
+    date: dateStr,
+  });
+
+  console.log(`Sent prayer times for device ${device.deviceToken} (${Object.keys(prayerTimesPayload).length} prayers)`);
+  return { sent: true };
 }
 
 export const handler: ScheduledHandler = async (event) => {
@@ -129,16 +65,26 @@ export const handler: ScheduledHandler = async (event) => {
     total: devices.length,
     successful: 0,
     failed: 0,
-    totalScheduled: 0,
-    totalErrors: 0,
+    skipped: 0,
   };
+
+  let messagingToken: string;
+  try {
+    messagingToken = await getSkillMessagingToken(SKILL_CLIENT_ID, SKILL_CLIENT_SECRET);
+    console.log("Obtained Skill Messaging access token");
+  } catch (err) {
+    console.error("Failed to get Skill Messaging token:", err);
+    return;
+  }
 
   for (const device of devices) {
     try {
-      const { scheduled, errors } = await scheduleRemindersForDevice(device);
-      results.successful++;
-      results.totalScheduled += scheduled;
-      results.totalErrors += errors;
+      const { sent } = await sendPrayerTimesForDevice(device, messagingToken);
+      if (sent) {
+        results.successful++;
+      } else {
+        results.skipped++;
+      }
     } catch (err) {
       results.failed++;
       console.error(`Failed to process device ${device.deviceToken}:`, err);

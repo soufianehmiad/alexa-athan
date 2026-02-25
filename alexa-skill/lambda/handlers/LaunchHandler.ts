@@ -15,6 +15,13 @@ export const LaunchHandler: RequestHandler = {
     const city = sessionAttributes.city || 'mecca';
     const coords = CITY_COORDINATES[city.toLowerCase()];
 
+    // Capture userId for the iOS app to retrieve during onboarding
+    const userId = handlerInput.requestEnvelope.context.System.user?.userId;
+    if (userId) {
+      sessionAttributes.alexaUserId = userId;
+      handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+    }
+
     let speechText =
       'Welcome to Athan. I can tell you prayer times, play the athan, or set your city.';
 

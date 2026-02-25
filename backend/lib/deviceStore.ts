@@ -21,6 +21,7 @@ export interface DeviceConfig {
   alexaDeviceIds: string[];
   lwaTokenEncrypted: string;
   lwaRefreshTokenEncrypted: string;
+  alexaUserId?: string;
   updatedAt: string;
   ttl?: number;
 }

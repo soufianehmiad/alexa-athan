@@ -1,29 +1,19 @@
 import * as deviceStore from "../lib/deviceStore";
-import * as alexaReminders from "../lib/alexaReminders";
-import * as encryption from "../lib/encryption";
-import * as prayerEngine from "../lib/prayerEngine";
+import * as skillMessaging from "../lib/skillMessaging";
 import type { ScheduledEvent, Context, Callback } from "aws-lambda";
 
 jest.mock("../lib/deviceStore");
-jest.mock("../lib/alexaReminders");
-jest.mock("../lib/encryption");
+jest.mock("../lib/skillMessaging");
 
 const mockedScanAllDevices = jest.mocked(deviceStore.scanAllDevices);
-const mockedPutDevice = jest.mocked(deviceStore.putDevice);
-const mockedRefreshLwaToken = jest.mocked(alexaReminders.refreshLwaToken);
-const mockedGetAllReminders = jest.mocked(alexaReminders.getAllReminders);
-const mockedDeleteReminder = jest.mocked(alexaReminders.deleteReminder);
-const mockedCreateReminder = jest.mocked(alexaReminders.createReminder);
-const mockedDecrypt = jest.mocked(encryption.decrypt);
-const mockedEncrypt = jest.mocked(encryption.encrypt);
+const mockedGetSkillMessagingToken = jest.mocked(skillMessaging.getSkillMessagingToken);
+const mockedSendSkillMessage = jest.mocked(skillMessaging.sendSkillMessage);
 
-// Import handler after mocks
 let handler: typeof import("../functions/scheduler/dailyCron").handler;
 
 beforeAll(async () => {
-  process.env.ENCRYPTION_KEY = "test-key";
-  process.env.LWA_CLIENT_ID = "test-client-id";
-  process.env.LWA_CLIENT_SECRET = "test-client-secret";
+  process.env.SKILL_CLIENT_ID = "test-skill-client-id";
+  process.env.SKILL_CLIENT_SECRET = "test-skill-client-secret";
   const mod = await import("../functions/scheduler/dailyCron");
   handler = mod.handler;
 });
@@ -44,6 +34,7 @@ describe("dailyCron handler", () => {
     offsets: {},
     enabledPrayers: ["fajr", "dhuhr", "asr", "maghrib", "isha"],
     alexaDeviceIds: ["echo-1"],
+    alexaUserId: "amzn1.ask.account.TEST_USER_1",
     lwaTokenEncrypted: "encrypted-access",
     lwaRefreshTokenEncrypted: "encrypted-refresh",
     updatedAt: "2026-02-24T00:00:00.000Z",
@@ -52,103 +43,90 @@ describe("dailyCron handler", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockedDecrypt.mockReturnValue("decrypted-refresh-token");
-    mockedEncrypt.mockReturnValue("new-encrypted-token");
-
-    mockedRefreshLwaToken.mockResolvedValue({
-      access_token: "new-access-token",
-      refresh_token: "new-refresh-token",
-      token_type: "bearer",
-      expires_in: 3600,
-    });
-
-    mockedPutDevice.mockResolvedValue(mockDevice);
-    mockedGetAllReminders.mockResolvedValue({ totalCount: 0, alerts: [] });
-    mockedDeleteReminder.mockResolvedValue();
-    mockedCreateReminder.mockResolvedValue({
-      alertToken: "alert-123",
-      createdTime: new Date().toISOString(),
-      updatedTime: new Date().toISOString(),
-      status: "ON",
-      href: "/v1/alerts/reminders/alert-123",
-    });
+    mockedGetSkillMessagingToken.mockResolvedValue("messaging-token-123");
+    mockedSendSkillMessage.mockResolvedValue();
   });
 
   it("should process no devices without error", async () => {
     mockedScanAllDevices.mockResolvedValue([]);
     await handler(mockEvent, mockContext, mockCallback);
     expect(mockedScanAllDevices).toHaveBeenCalledTimes(1);
-    expect(mockedRefreshLwaToken).not.toHaveBeenCalled();
+    expect(mockedGetSkillMessagingToken).toHaveBeenCalledTimes(1);
+    expect(mockedSendSkillMessage).not.toHaveBeenCalled();
   });
 
-  it("should refresh tokens and schedule reminders for a device", async () => {
+  it("should get skill messaging token and send prayer times for a device", async () => {
     mockedScanAllDevices.mockResolvedValue([mockDevice]);
 
     await handler(mockEvent, mockContext, mockCallback);
 
-    expect(mockedDecrypt).toHaveBeenCalledWith("encrypted-refresh", "test-key");
-    expect(mockedRefreshLwaToken).toHaveBeenCalledWith(
-      "decrypted-refresh-token",
-      "test-client-id",
-      "test-client-secret"
+    expect(mockedGetSkillMessagingToken).toHaveBeenCalledWith(
+      "test-skill-client-id",
+      "test-skill-client-secret"
     );
-    expect(mockedPutDevice).toHaveBeenCalled();
-    expect(mockedGetAllReminders).toHaveBeenCalledWith("new-access-token");
-    // Should attempt to create reminders for enabled prayers
-    expect(mockedCreateReminder).toHaveBeenCalled();
+    expect(mockedSendSkillMessage).toHaveBeenCalledTimes(1);
+    expect(mockedSendSkillMessage).toHaveBeenCalledWith(
+      "messaging-token-123",
+      "amzn1.ask.account.TEST_USER_1",
+      expect.objectContaining({
+        timezone: expect.any(String),
+        date: expect.any(String),
+        prayerTimes: expect.any(Object),
+      })
+    );
   });
 
-  it("should delete existing reminders before creating new ones", async () => {
-    mockedScanAllDevices.mockResolvedValue([mockDevice]);
-    mockedGetAllReminders.mockResolvedValue({
-      totalCount: 2,
-      alerts: [
-        { alertToken: "old-1", status: "ON" },
-        { alertToken: "old-2", status: "ON" },
-      ],
-    });
+  it("should skip devices without alexaUserId", async () => {
+    const deviceWithoutUserId = { ...mockDevice, alexaUserId: undefined };
+    mockedScanAllDevices.mockResolvedValue([deviceWithoutUserId]);
 
     await handler(mockEvent, mockContext, mockCallback);
 
-    expect(mockedDeleteReminder).toHaveBeenCalledTimes(2);
-    expect(mockedDeleteReminder).toHaveBeenCalledWith("new-access-token", "old-1");
-    expect(mockedDeleteReminder).toHaveBeenCalledWith("new-access-token", "old-2");
+    expect(mockedSendSkillMessage).not.toHaveBeenCalled();
   });
 
   it("should continue processing other devices if one fails", async () => {
-    const device2 = { ...mockDevice, pk: "DEVICE#token-2", deviceToken: "token-2" };
+    const device2 = {
+      ...mockDevice,
+      pk: "DEVICE#token-2",
+      deviceToken: "token-2",
+      alexaUserId: "amzn1.ask.account.TEST_USER_2",
+    };
     mockedScanAllDevices.mockResolvedValue([mockDevice, device2]);
 
-    // First device token refresh fails
-    mockedDecrypt
-      .mockReturnValueOnce("bad-token")
-      .mockReturnValueOnce("good-token");
-
-    mockedRefreshLwaToken
-      .mockRejectedValueOnce(new Error("Token expired"))
-      .mockResolvedValueOnce({
-        access_token: "token-2-access",
-        refresh_token: "token-2-refresh",
-        token_type: "bearer",
-        expires_in: 3600,
-      });
+    mockedSendSkillMessage
+      .mockRejectedValueOnce(new Error("Messaging failed"))
+      .mockResolvedValueOnce();
 
     await handler(mockEvent, mockContext, mockCallback);
 
-    // Should still try the second device
-    expect(mockedRefreshLwaToken).toHaveBeenCalledTimes(2);
+    expect(mockedSendSkillMessage).toHaveBeenCalledTimes(2);
   });
 
-  it("should only schedule enabled prayers", async () => {
+  it("should only include enabled prayers in the payload", async () => {
     const device = {
       ...mockDevice,
-      enabledPrayers: ["fajr", "isha"], // Only 2 prayers enabled
+      enabledPrayers: ["fajr", "isha"],
     };
     mockedScanAllDevices.mockResolvedValue([device]);
 
     await handler(mockEvent, mockContext, mockCallback);
 
-    // At most 2 createReminder calls (may be fewer if times already passed)
-    expect(mockedCreateReminder.mock.calls.length).toBeLessThanOrEqual(2);
+    expect(mockedSendSkillMessage).toHaveBeenCalledTimes(1);
+    const payload = mockedSendSkillMessage.mock.calls[0][2];
+    const prayerNames = Object.keys(payload.prayerTimes);
+    // Should only contain enabled prayers (fajr and isha)
+    for (const name of prayerNames) {
+      expect(["fajr", "isha"]).toContain(name);
+    }
+  });
+
+  it("should abort if skill messaging token fetch fails", async () => {
+    mockedGetSkillMessagingToken.mockRejectedValue(new Error("Token fetch failed"));
+    mockedScanAllDevices.mockResolvedValue([mockDevice]);
+
+    await handler(mockEvent, mockContext, mockCallback);
+
+    expect(mockedSendSkillMessage).not.toHaveBeenCalled();
   });
 });

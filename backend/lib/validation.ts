@@ -12,6 +12,7 @@ export interface SyncConfigInput {
   offsets?: Record<string, number>;
   enabledPrayers?: string[];
   alexaDeviceIds?: string[];
+  alexaUserId?: string;
   lwaAccessToken: string;
   lwaRefreshToken: string;
 }
@@ -88,6 +89,12 @@ export function validateSyncConfig(body: unknown): { data: SyncConfigInput; erro
   if (input.alexaDeviceIds !== undefined) {
     if (!Array.isArray(input.alexaDeviceIds)) {
       errors.push({ field: "alexaDeviceIds", message: "alexaDeviceIds must be an array" });
+    }
+  }
+
+  if (input.alexaUserId !== undefined) {
+    if (typeof input.alexaUserId !== "string" || input.alexaUserId.trim().length === 0) {
+      errors.push({ field: "alexaUserId", message: "alexaUserId must be a non-empty string if provided" });
     }
   }
 

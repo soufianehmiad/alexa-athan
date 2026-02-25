@@ -2,6 +2,10 @@ service: athan-backend
 
 frameworkVersion: "3"
 
+custom:
+  dotenv:
+    path: ../.env
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -14,6 +18,8 @@ provider:
     ENCRYPTION_KEY: ${env:ENCRYPTION_KEY, 'dev-encryption-key-change-in-prod'}
     LWA_CLIENT_ID: ${env:LWA_CLIENT_ID, ''}
     LWA_CLIENT_SECRET: ${env:LWA_CLIENT_SECRET, ''}
+    SKILL_CLIENT_ID: ${env:SKILL_CLIENT_ID, ''}
+    SKILL_CLIENT_SECRET: ${env:SKILL_CLIENT_SECRET, ''}
     STAGE: ${self:provider.stage}
   iam:
     role:
@@ -82,4 +88,5 @@ resources:
           Enabled: true
 
 plugins:
+  - serverless-dotenv-plugin
   - serverless-plugin-typescript

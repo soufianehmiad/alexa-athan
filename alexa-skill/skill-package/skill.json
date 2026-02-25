@@ -38,6 +38,16 @@
         ]
       }
     },
+    "events": {
+      "endpoint": {
+        "uri": "arn:aws:lambda:us-east-1:ACCOUNT_ID:function:athan-alexa-skill"
+      },
+      "subscriptions": [
+        {
+          "eventName": "SKILL_MESSAGING"
+        }
+      ]
+    },
     "manifestVersion": "1.0",
     "permissions": [
       {

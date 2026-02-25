@@ -56,6 +56,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       offsets: data.offsets ?? {},
       enabledPrayers: data.enabledPrayers ?? DEFAULT_PRAYERS,
       alexaDeviceIds: data.alexaDeviceIds ?? [],
+      alexaUserId: data.alexaUserId,
       lwaTokenEncrypted,
       lwaRefreshTokenEncrypted,
       updatedAt: new Date().toISOString(),

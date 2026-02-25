@@ -1,4 +1,5 @@
 import { SkillBuilders } from 'ask-sdk-core';
+import { MessageReceivedHandler } from './handlers/MessageReceivedHandler';
 import { LaunchHandler } from './handlers/LaunchHandler';
 import { PlayAthanHandler } from './handlers/PlayAthanHandler';
 import { PrayerTimesHandler } from './handlers/PrayerTimesHandler';
@@ -17,6 +18,7 @@ import { ErrorHandler } from './handlers/ErrorHandler';
 
 const skill = SkillBuilders.custom()
   .addRequestHandlers(
+    MessageReceivedHandler,
     LaunchHandler,
     PlayAthanHandler,
     PrayerTimesHandler,

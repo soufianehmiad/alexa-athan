@@ -55,6 +55,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Prompts (local only)
+prompts/
+
 # Misc
 *.tgz
 .cache/

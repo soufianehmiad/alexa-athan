@@ -72,4 +72,5 @@ export interface SessionAttributes {
   latitude?: number;
   longitude?: number;
   timezone?: string;
+  alexaUserId?: string;
 }

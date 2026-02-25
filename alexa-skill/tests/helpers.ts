@@ -142,6 +142,49 @@ export function createSessionEndedRequestEnvelope(): RequestEnvelope {
   };
 }
 
+interface CreateMessageReceivedOptions {
+  message: {
+    operation: string;
+    prayerTimes?: Record<string, string>;
+    timezone?: string;
+    date?: string;
+    requestId?: string;
+  };
+  apiAccessToken?: string;
+  apiEndpoint?: string;
+}
+
+export function createMessageReceivedEnvelope(
+  options: CreateMessageReceivedOptions
+): RequestEnvelope {
+  return {
+    version: '1.0',
+    session: undefined as any,
+    context: {
+      System: {
+        application: {
+          applicationId: 'amzn1.ask.skill.test',
+        },
+        user: {
+          userId: 'test-user-id',
+        },
+        device: {
+          deviceId: 'test-device-id',
+          supportedInterfaces: {},
+        },
+        apiEndpoint: options.apiEndpoint || 'https://api.amazonalexa.com',
+        apiAccessToken: options.apiAccessToken ?? 'test-token',
+      },
+    },
+    request: {
+      type: 'Messaging.MessageReceived',
+      requestId: 'test-request-id',
+      timestamp: new Date().toISOString(),
+      message: options.message,
+    } as any,
+  };
+}
+
 export function createAudioPlayerRequestEnvelope(
   requestType: string,
   token: string = 'athan-fajr-123'
